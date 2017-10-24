@@ -1,56 +1,72 @@
-//Transmitter
-//visit www.rootsaid.com for full tutorial
+//Receiver
+//Visit www.rootsaid.com for full tutorial
+//For Video Demo and tutorials Visit www.youtube.com/c/rootsaid
 
 #include <SoftwareSerial.h>
-#include<Servo.h>         
+#include<Servo.h>          
 
 Servo esc; 
-SoftwareSerial hc12(2, 3); //RX, TX
 
-int thr, ail, ele, rud;
+Servo ele;
+Servo ruddr;
+
+String input;
+int throttle, th;
+int aileron, ail;
+int elevator, el;
+int rudder, rud;
+
+int boundLow;
+int boundHigh;
+const char delimiter = ',';
+
+SoftwareSerial hc12(4, 5);
 
 void setup()
 {
+ele.attach(9);
+ruddr.attach(11);
+
 esc.attach(10);
-pinMode (A0, INPUT);
-pinMode (A1, INPUT);
-pinMode (A6, INPUT);
-pinMode (A7, INPUT);
-pinMode (A2, INPUT);
-pinMode (13, OUTPUT);
- 
 Serial.begin(9600);
 hc12.begin(9600);
+esc.write(170);
+delay(2000);
+esc.write(90);
+delay(2000);
+esc.write(140);
+delay(2000);
+esc.write(90);
+delay(2000);
 }
 
 void loop()
 {
-  ele=map(analogRead(A0), 0, 1023, 0, 180);
-  rud=map(analogRead(A1), 0, 1023, 0, 180);
-  thr=map(analogRead(A7), 0, 1023, 0, 180);
-  ail=map(analogRead(A5), 0, 1023, 0, 180);
 
-  hc12.print(thr);
-  hc12.print(",");
-  hc12.print(ail);
-  hc12.print(",");
-  hc12.print(ele);
-  hc12.print(",");
-  hc12.print(rud);
-  hc12.println("");
- 
-  Serial.print(thr);
-  Serial.print(",");
-  Serial.print(ail);
-  Serial.print(",");
-  Serial.print(ele);
-  Serial.print(",");
-  Serial.print(rud);
-  Serial.println("");
+if(Serial.available())
+  {
+  input = Serial.readStringUntil('\n');
+  if (input.length() > 0)
+      {
+       // Serial.println(input);
+       
+        boundLow = input.indexOf(delimiter);
+        throttle = input.substring(0, boundLow).toInt();
+    
+        boundHigh = input.indexOf(delimiter, boundLow+1);
+        aileron = input.substring(boundLow+1, boundHigh).toInt();
+    
+        boundLow = input.indexOf(delimiter, boundHigh+1);
+        elevator = input.substring(boundHigh+1, boundLow).toInt();
+    
+        rudder = input.substring(boundLow+1).toInt();
 
+       esc.write(throttle);
+       ele.write(elevator);
+       ruddr.write(rudder);
+       delay(10);      }
 
-delay(100);  
+  }
+
 }
-
-
 
