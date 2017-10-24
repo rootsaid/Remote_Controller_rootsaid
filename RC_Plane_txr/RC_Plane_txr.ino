@@ -1,5 +1,7 @@
 //Transmitter
 //visit www.rootsaid.com for full tutorial
+//For Video Demo and tutorials Visit www.youtube.com/c/rootsaid
+
 
 #include <SoftwareSerial.h>
 #include<Servo.h>         
